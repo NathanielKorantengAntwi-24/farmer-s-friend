@@ -1,5 +1,5 @@
 // src/app/layout.tsx
-import type { Metadata, Viewport } from "next"; // Added Viewport type
+import type { Metadata, Viewport } from "next"; 
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -20,6 +20,15 @@ export const metadata: Metadata = {
   title: "Farmer's Friend",
   description: "Precision Calf Dehydration Management",
   manifest: "/manifest.json", 
+  // Added icons for browser tab visibility
+  icons: {
+    icon: [
+      { url: "/favicon.ico", type: "image/x-icon" },
+      { url: "/icon-192.png", type: "image/png", sizes: "192x192" },
+    ],
+    shortcut: "/favicon.ico",
+    apple: "/icon-192.png",
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
@@ -32,7 +41,7 @@ export const viewport: Viewport = {
   themeColor: "#2e7d32",
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1, // Prevents accidental zooming on mobile forms
+  maximumScale: 1, 
 };
 
 export default function RootLayout({
