@@ -1,6 +1,6 @@
 {
   "name": "Farmer's Friend",
-  "short_name": "FarmersFriend",
+  "short_name": "Farmer's Friend",
   "description": "Calf Assessment and Tracking Tool",
   "start_url": "/",
   "display": "standalone",
@@ -9,13 +9,15 @@
   "icons": [
     {
       "src": "/icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png"
+      "sizes": "192x192 any",
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
       "src": "/icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png"
+      "sizes": "512x512 any",
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }

@@ -198,11 +198,10 @@ export default function StatusIntelligentDashboard({ user }: { user: any }) {
     <Box sx={{ 
     minHeight: '100vh', 
     pb: 12, 
-    // Replace 'farm-background.jpg' with your actual image filename in the /public folder
-    backgroundImage: `linear-gradient(to bottom, rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.8)), url('./bg-image.avif')`,
+    backgroundImage: `linear-gradient(to bottom, rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.8)), url('/bg-image.avif')`,
     backgroundSize: 'cover',
     backgroundPosition: 'center',
-    backgroundAttachment: 'fixed' // Keeps the image still while you scroll
+    backgroundAttachment: 'fixed' 
   }}>
       
       {/* HEADER */}
@@ -245,7 +244,7 @@ export default function StatusIntelligentDashboard({ user }: { user: any }) {
       <Container maxWidth="md">
         <Paper sx={{ borderRadius: 8, overflow: 'hidden', backgroundColor: 'rgba(255, 255, 255, 0.98)' }}>
           <Box sx={{ p: 2.5, display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #eee' }}>
-            <Typography variant="subtitle1" fontWeight="900" color="#1e293b">{navValue === 0 ? "Active Fleet" : "History Log"}</Typography>
+            <Typography variant="subtitle1" fontWeight="900" color="#1e293b">{navValue === 0 ? "Active Records" : "History Log"}</Typography>
             <Chip label={displayedCalves.length} size="small" sx={{ fontWeight: 900, bgcolor: '#0f172a', color: '#fff' }} />
           </Box>
           
@@ -326,7 +325,7 @@ export default function StatusIntelligentDashboard({ user }: { user: any }) {
           <Box sx={{ position: 'absolute', bottom: 0, left: 0, right: 0, bgcolor: '#fff', borderTopLeftRadius: 32, borderTopRightRadius: 32, p: 4, pb: 6 }}>
             <Box sx={{ width: 40, height: 4, bgcolor: '#e2e8f0', borderRadius: 2, mx: 'auto', mb: 3 }} />
             <Stack direction="row" justifyContent="space-between" sx={{ mb: 4 }}>
-              <Typography variant="h5" fontWeight="900">A. Pre-Transport Information</Typography>
+              <Typography variant="h5" fontWeight="900">Pre-Transport Registration</Typography>
               <IconButton onClick={() => setOpenModal(false)}><CloseIcon /></IconButton>
             </Stack>
             <form onSubmit={handleSubmit}>

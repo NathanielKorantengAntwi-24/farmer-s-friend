@@ -1,5 +1,5 @@
 // src/app/layout.tsx
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next"; // Added Viewport type
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -15,16 +15,24 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+// 1. Identity & SEO Metadata
 export const metadata: Metadata = {
   title: "Farmer's Friend",
   description: "Precision Calf Dehydration Management",
-  manifest: "/manifest.json", // Points to your public/manifest.json
-  themeColor: "#2e7d32",      // A nice farm green for the status bar
+  manifest: "/manifest.json", 
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
     title: "Farmer's Friend",
   },
+};
+
+// 2. New Viewport Configuration (Fixes the warning)
+export const viewport: Viewport = {
+  themeColor: "#2e7d32",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1, // Prevents accidental zooming on mobile forms
 };
 
 export default function RootLayout({

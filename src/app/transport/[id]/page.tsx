@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { db, auth, doc, updateDoc, getDoc, onAuthStateChanged } from '@/lib/firebase';
 import { 
   Container, Typography, Box, Button, Paper, Stack, 
-  CircularProgress, MenuItem, TextField, Avatar, Fade, alpha, IconButton
+  CircularProgress, MenuItem, TextField, Avatar, Fade, alpha, IconButton, Zoom
 } from '@mui/material';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
@@ -63,7 +63,7 @@ export default function TransportPage() {
   }, [hasMounted, id, router]);
 
   const handleUpdateTransport = async (e: React.FormEvent) => {
-    e.preventDefault(); // Form handles validation now
+    e.preventDefault(); 
     if (!id) return;
     setIsUpdating(true);
     try {
@@ -97,34 +97,58 @@ export default function TransportPage() {
   if (showSuccess) {
     return (
       <Box sx={{ 
-    minHeight: '100vh', 
-    pb: 12, 
-    // Replace 'farm-background.jpg' with your actual image filename in the /public folder
-    backgroundImage: `linear-gradient(to bottom, rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.8)), url('./bg-image.avif')`,
-    backgroundSize: 'cover',
-    backgroundPosition: 'center',
-    backgroundAttachment: 'fixed' // Keeps the image still while you scroll
-  }}>
-        <Fade in={showSuccess}>
-          <Paper sx={{ p: 4, textAlign: 'center', borderRadius: 8, width: '100%', maxWidth: 400, mx: 'auto' }}>
-            <CheckCircleIcon sx={{ fontSize: 60, color: '#10b981', mb: 2 }} />
-            <Typography variant="h5" fontWeight="900">Journey Updated</Typography>
-            <Typography variant="body2" sx={{ mb: 3 }} color="text.secondary">Scan to perform <b>C. Arrival Assessment</b></Typography>
-            <Box sx={{ p: 2, bgcolor: '#fff', borderRadius: 4, mb: 4, border: '1px solid #eee', display: 'flex', justifyContent: 'center' }}>
-              <QRCodeCanvas value={getArrivalUrl()} size={200} />
-            </Box>
-            <Button fullWidth variant="contained" onClick={() => router.push('/')} sx={{ py: 2, borderRadius: 3, bgcolor: '#0f172a', fontWeight: 'bold' }}>
-              Back to Dashboard
-            </Button>
-          </Paper>
-        </Fade>
+        minHeight: '100vh', 
+        pb: 12, 
+        backgroundImage: `linear-gradient(to bottom, rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.8)), url('./bg-image.avif')`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed'
+      }}>
+        <Container maxWidth="sm" sx={{ pt: 4 }}>
+          <Fade in={showSuccess} timeout={800}>
+            <Paper sx={{ p: 4, textAlign: 'center', borderRadius: 8, width: '100%', maxWidth: 400, mx: 'auto' }}>
+              <CheckCircleIcon sx={{ fontSize: 60, color: '#10b981', mb: 2 }} />
+              <Typography variant="h5" fontWeight="900">Journey Updated</Typography>
+              <Typography variant="body2" sx={{ mb: 1 }} color="text.secondary">Scan to perform <b>Arrival Assessment</b></Typography>
+              
+              <Zoom in={showSuccess} style={{ transitionDelay: '400ms' }}>
+                <Box sx={{ 
+                  mt: 6, 
+                  p: 2.5, 
+                  bgcolor: '#fff', 
+                  borderRadius: 4, 
+                  mb: 4, 
+                  border: '1px solid #eee', 
+                  display: 'flex', 
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)'
+                }}>
+                  <QRCodeCanvas value={getArrivalUrl()} size={200} />
+                  <Typography variant="caption" sx={{ mt: 2, color: '#64748b', fontWeight: 600 }}>ID: {id?.toString().slice(-6).toUpperCase()}</Typography>
+                </Box>
+              </Zoom>
+
+              <Button fullWidth variant="contained" onClick={() => router.push('/')} sx={{ py: 2, borderRadius: 3, bgcolor: '#0f172a', fontWeight: 'bold' }}>
+                Back to Dashboard
+              </Button>
+            </Paper>
+          </Fade>
+        </Container>
       </Box>
     );
   }
 
   return (
-    <Box sx={{ minHeight: '100vh', py: 4, bgcolor: '#0f172a' }}>
-      <Container maxWidth="sm">
+    <Box sx={{ 
+       minHeight: '100vh', 
+       pb: 12, 
+       backgroundImage: `linear-gradient(to bottom, rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.8)), url('/bg-image.avif')`,
+       backgroundSize: 'cover',
+       backgroundPosition: 'center',
+       backgroundAttachment: 'fixed'
+     }}>
+      <Container maxWidth="sm" sx={{ pt: 4 }}>
         <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
           <IconButton onClick={() => router.push('/')} sx={{ color: alpha('#fff', 0.8) }}>
             <ChevronLeftIcon />
@@ -144,7 +168,7 @@ export default function TransportPage() {
             <Stack spacing={3}>
               <Stack direction="row" spacing={1.5} alignItems="center">
                 <Avatar sx={{ bgcolor: '#0f172a', width: 32, height: 32 }}><LocalShippingIcon sx={{ fontSize: 18 }} /></Avatar>
-                <Typography variant="h5" fontWeight="900" color="#0f172a">B. In-Transport Updates</Typography>
+                <Typography variant="h5" fontWeight="900" color="#0f172a">In-Transport Updates</Typography>
               </Stack>
               
               <TextField 
@@ -192,7 +216,7 @@ export default function TransportPage() {
                 disabled={isUpdating} 
                 sx={{ py: 2, borderRadius: 4, bgcolor: '#0f172a', fontWeight: 900, textTransform: 'none' }}
               >
-                {isUpdating ? "Saving..." : "Generate Arrival Code"}
+                {isUpdating ? <CircularProgress size={24} sx={{ color: 'white' }} /> : "Generate Arrival Code"}
               </Button>
             </Stack>
           </form>

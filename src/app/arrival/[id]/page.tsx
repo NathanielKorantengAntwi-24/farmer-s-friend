@@ -90,7 +90,7 @@ export default function ArrivalPage() {
     minHeight: '100vh', 
     pb: 12, 
     // Replace 'farm-background.jpg' with your actual image filename in the /public folder
-    backgroundImage: `linear-gradient(to bottom, rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.8)), url('./bg-image.avif')`,
+    backgroundImage: `linear-gradient(to bottom, rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.8)), url('/bg-image.avif')`,
     backgroundSize: 'cover',
     backgroundPosition: 'center',
     backgroundAttachment: 'fixed' // Keeps the image still while you scroll
@@ -113,7 +113,7 @@ export default function ArrivalPage() {
         <Paper sx={{ p: 4, borderRadius: 8, bgcolor: 'rgba(255,255,255,0.98)' }}>
           <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 4 }}>
             <Avatar sx={{ bgcolor: '#0f172a', width: 32, height: 32 }}><ShieldIcon sx={{ fontSize: 18 }} /></Avatar>
-            <Typography variant="h5" fontWeight="900" color="#0f172a">C. Arrival Assessment</Typography>
+            <Typography variant="h5" fontWeight="900" color="#0f172a">Arrival Assessment</Typography>
           </Stack>
 
           <form onSubmit={handleSubmit}>

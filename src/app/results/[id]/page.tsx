@@ -127,14 +127,14 @@ export default function ResultsPage() {
   }, [data]);
 
   const config = {
-    HIGH: { color: '#ef4444', label: 'RED — HIGH RISK', icon: <ErrorIcon /> },
-    MODERATE: { color: '#f59e0b', label: 'YELLOW — MODERATE RISK', icon: <WarningIcon /> },
-    LOW: { color: '#10b981', label: 'GREEN — LOW RISK', icon: <CheckCircleIcon /> }
+    HIGH: { color: '#ef4444', label: 'HIGH RISK', icon: <ErrorIcon /> },
+    MODERATE: { color: '#f59e0b', label: 'MODERATE RISK', icon: <WarningIcon /> },
+    LOW: { color: '#0c3c2cff', label: 'LOW RISK', icon: <CheckCircleIcon /> }
   }[assessment?.risk || 'LOW'];
 
   if (!hasMounted || loading) return (
     <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: '#0f172a' }}>
-      <CircularProgress sx={{ color: '#10b981' }} />
+      <CircularProgress sx={{ color: '#032a1dff' }} />
     </Box>
   );
 
@@ -143,7 +143,7 @@ export default function ResultsPage() {
     minHeight: '100vh', 
     pb: 12, 
    
-    backgroundImage: `linear-gradient(to bottom, rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.8)), url('./bg-image.avif')`,
+    backgroundImage: `linear-gradient(to bottom, rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.8)), url('/bg-image.avif')`,
     backgroundSize: 'cover',
     backgroundPosition: 'center',
     backgroundAttachment: 'fixed'
