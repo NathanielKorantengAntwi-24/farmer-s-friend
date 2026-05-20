@@ -15,6 +15,8 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Error';
 import WarningIcon from '@mui/icons-material/Warning';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import WaterDropIcon from '@mui/icons-material/WaterDrop';
+import LocationOnIcon from '@mui/icons-material/LocationOn'; // Import for Location
 
 function RecommendationItem({ text, color }: { text: string, color: string }) {
   return (
@@ -33,7 +35,7 @@ export default function ResultsPage() {
   const calfId = params?.id as string;
   
   const [data, setData] = useState<any>(null);
-  const [farm, setFarm] = useState<any>(null); // State for farm branding
+  const [farm, setFarm] = useState<any>(null); 
   const [loading, setLoading] = useState(true);
   const [hasMounted, setHasMounted] = useState(false);
 
@@ -41,13 +43,10 @@ export default function ResultsPage() {
     setHasMounted(true);
     const fetchAllData = async (uid: string) => {
       try {
-        // 1. Fetch Calf Data
         const calfSnap = await getDoc(doc(db, "calves", calfId));
         if (calfSnap.exists()) {
           setData(calfSnap.data());
         }
-
-        // 2. Fetch User/Farm Branding
         const userSnap = await getDoc(doc(db, "users", uid));
         if (userSnap.exists() && userSnap.data().farm) {
           setFarm(userSnap.data().farm);
@@ -70,11 +69,7 @@ export default function ResultsPage() {
     if (!data?.createdAt) return '';
     const date = data.createdAt.toDate ? data.createdAt.toDate() : new Date(data.createdAt);
     return date.toLocaleDateString('en-US', { 
-      month: 'long', 
-      day: 'numeric', 
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
+      month: 'long', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit'
     });
   }, [data]);
 
@@ -84,10 +79,13 @@ export default function ResultsPage() {
     const { preTransport, arrival, inTransportUpdates } = data;
 
     const age = parseFloat(preTransport?.calfAge || 0);
+    const location = preTransport?.location || 'Unknown Location'; // Capture Location
     const colostrum = preTransport?.colostrumStatus;
     const temp = preTransport?.ambientTemp;
     const plannedHrs = parseFloat(preTransport?.plannedDuration || 0);
     const actualHrs = parseFloat(arrival?.actualDuration || 0);
+
+    const orsVolume = age > 0 ? (age / 2).toFixed(1) : null;
 
     let vulnerabilityFactor = 1.0;
     if (colostrum === 'Inadequate') vulnerabilityFactor += 0.5;
@@ -100,7 +98,6 @@ export default function ResultsPage() {
     
     if (temp === 'Hot') baseScore += 2;
     if (inTransportUpdates?.stressExposure === 'Severe') baseScore += 2;
-    if (temp === 'Hot' && inTransportUpdates?.stressExposure === 'Severe') baseScore += 2;
 
     let clinicalScore = 0;
     if (arrival?.eyeRecession === 'Moderate') clinicalScore += 5;
@@ -123,7 +120,7 @@ export default function ResultsPage() {
       risk = 'MODERATE';
     }
 
-    return { risk, score: Math.round(finalScore) };
+    return { risk, score: Math.round(finalScore), orsVolume, age, location };
   }, [data]);
 
   const config = {
@@ -140,61 +137,58 @@ export default function ResultsPage() {
 
   return (
     <Box sx={{ 
-    minHeight: '100vh', 
-    pb: 12, 
-   
-    backgroundImage: `linear-gradient(to bottom, rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.8)), url('/bg-image.avif')`,
-    backgroundSize: 'cover',
-    backgroundPosition: 'center',
-    backgroundAttachment: 'fixed'
-  }}>
+      minHeight: '100vh', pb: 12, 
+      backgroundImage: `linear-gradient(to bottom, rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.8)), url('/bg-image.avif')`,
+      backgroundSize: 'cover', backgroundPosition: 'center', backgroundAttachment: 'fixed'
+    }}>
       <Container maxWidth="sm">
         <Button startIcon={<ChevronLeftIcon />} onClick={() => router.push('/')} sx={{ color: alpha('#fff', 0.6), mb: 2, '@media print': { display: 'none' } }}>
           Back to Dashboard
         </Button>
 
         <Paper elevation={0} sx={{ borderRadius: 6, overflow: 'hidden', bgcolor: '#fff' }}>
-          
-          {/* PROFESSIONAL BRANDING HEADER */}
           {farm?.name && (
             <Box sx={{ p: 3, textAlign: 'center', bgcolor: '#f8fafc', borderBottom: '1px solid #edf2f7' }}>
-              <Typography variant="h6" fontWeight="900" color="#0f172a" sx={{ letterSpacing: '1px', textTransform: 'uppercase' }}>
-                {farm.name}
-              </Typography>
-              {farm.address && (
-                <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
-                  {farm.address}
-                </Typography>
-              )}
+              <Typography variant="h6" fontWeight="900" color="#0f172a" sx={{ letterSpacing: '1px', textTransform: 'uppercase' }}>{farm.name}</Typography>
+              {farm.address && <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>{farm.address}</Typography>}
             </Box>
           )}
 
-          {/* ASSESSMENT HEADER */}
           <Box sx={{ bgcolor: config.color, p: 4, color: 'white', textAlign: 'center' }}>
             <Box sx={{ display: 'flex', justifyContent: 'center', mb: 1 }}>
               {React.cloneElement(config.icon as React.ReactElement<any>, { sx: { fontSize: 40 } })}
             </Box>
-            <Typography variant="h4" fontWeight="900" sx={{ letterSpacing: '-1.5px', mb: 0.5 }}>
-              {config.label}
-            </Typography>
-            <Stack direction="row" spacing={1} justifyContent="center" alignItems="center" sx={{ opacity: 0.9 }}>
-              <CalendarMonthIcon sx={{ fontSize: 16 }} />
-              <Typography variant="subtitle2" fontWeight="700">
-                Assessed: {assessmentDate}
-              </Typography>
+            <Typography variant="h4" fontWeight="900" sx={{ letterSpacing: '-1.5px', mb: 0.5 }}>{config.label}</Typography>
+            
+            <Stack spacing={0.5} alignItems="center" sx={{ opacity: 0.9 }}>
+              <Stack direction="row" spacing={1} justifyContent="center" alignItems="center">
+                <CalendarMonthIcon sx={{ fontSize: 16 }} />
+                <Typography variant="subtitle2" fontWeight="700">Assessed: {assessmentDate}</Typography>
+              </Stack>
+              
+              {/* NEW LOCATION DISPLAY */}
+              <Stack direction="row" spacing={1} justifyContent="center" alignItems="center">
+                <LocationOnIcon sx={{ fontSize: 16 }} />
+                <Typography variant="subtitle2" fontWeight="700">From: {assessment?.location}</Typography>
+              </Stack>
             </Stack>
-            <Typography variant="caption" sx={{ display: 'block', mt: 0.5, opacity: 0.8, fontWeight: 700 }}>
-              Decision Logic Outcome: {assessment?.score} Points
-            </Typography>
           </Box>
 
           <Box sx={{ p: 4 }}>
-            <Typography variant="h6" fontWeight="900" color="#0f172a" gutterBottom>
-              Expert Nutritional Recommendations
-            </Typography>
+            <Typography variant="h6" fontWeight="900" color="#0f172a" gutterBottom>Expert Nutritional Recommendations</Typography>
             <Divider sx={{ mb: 3 }} />
 
             <Stack spacing={2.5}>
+              {(assessment?.risk === 'MODERATE' || assessment?.risk === 'HIGH') && assessment?.orsVolume && (
+                <Box sx={{ p: 2, borderRadius: 3, bgcolor: '#f8fafc', border: `2px solid ${config.color}`, display: 'flex', alignItems: 'center', gap: 2 }}>
+                  <WaterDropIcon sx={{ color: config.color, fontSize: 30 }} />
+                  <Box>
+                    <Typography variant="caption" fontWeight="900" color="text.secondary"> ORS INTAKE</Typography>
+                    <Typography variant="h5" fontWeight="900" color="#0f172a">{assessment.orsVolume} Litres</Typography>
+                  </Box>
+                </Box>
+              )}
+
               {assessment?.risk === 'LOW' && (
                 <>
                   <RecommendationItem text="ORS is not immediately required as a primary intervention for low-risk calves." color="#10b981" />
@@ -239,14 +233,9 @@ export default function ResultsPage() {
             </Box>
             
             <Button 
-              fullWidth 
-              variant="contained" 
-              startIcon={<DownloadIcon />} 
+              fullWidth variant="contained" startIcon={<DownloadIcon />} 
               onClick={() => window.print()} 
-              sx={{ 
-                mt: 4, py: 2, bgcolor: '#0f172a', fontWeight: 900, borderRadius: 3,
-                '@media print': { display: 'none' } 
-              }}
+              sx={{ mt: 4, py: 2, bgcolor: '#0f172a', fontWeight: 900, borderRadius: 3, '@media print': { display: 'none' } }}
             >
               Export Assessment Poster
             </Button>

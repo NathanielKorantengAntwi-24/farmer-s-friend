@@ -7,7 +7,7 @@ import {
   Table, TableBody, TableCell, TableContainer, TableRow, 
   Chip, alpha, Avatar, IconButton, Modal, Fade,
   Fab, BottomNavigation, BottomNavigationAction, Container,
-  Dialog, DialogTitle, DialogActions, InputAdornment
+  Dialog, DialogTitle, DialogActions, InputAdornment, Divider
 } from '@mui/material';
 import { QRCodeCanvas } from 'qrcode.react';
 import Link from 'next/link';
@@ -43,12 +43,16 @@ export default function StatusIntelligentDashboard({ user }: { user: any }) {
   const [permanentConfirm, setPermanentConfirm] = useState<{ open: boolean; id: string | null }>({ open: false, id: null });
   
   const [formData, setFormData] = useState({
-    calfAge: '', colostrumStatus: 'Adequate', lastFeeding: '', plannedDuration: '', ambientTemp: 'Mild'
+    calfAge: '', 
+    location: '', // Location moved in state for clarity
+    colostrumStatus: 'Adequate', 
+    lastFeeding: '', 
+    plannedDuration: '', 
+    ambientTemp: 'Mild'
   });
 
   const [farmDetails, setFarmDetails] = useState({ name: '', address: '' });
 
-  // 1. Initial mounting guard
   useEffect(() => {
     setHasMounted(true);
   }, []);
@@ -120,10 +124,10 @@ export default function StatusIntelligentDashboard({ user }: { user: any }) {
     }
   };
 
-  const getNextStepUrl = (id: string, currentStatus: string) => {
+  const getNextStepUrl = (id: string, currentStatus: string, target?: string) => {
     if (typeof window === 'undefined') return ''; 
     const baseUrl = window.location.origin;
-    const path = currentStatus === 'pre-transport' ? 'transport' : currentStatus === 'in-transport' ? 'arrival' : 'results';
+    const path = target || (currentStatus === 'pre-transport' ? 'transport' : currentStatus === 'in-transport' ? 'arrival' : 'results');
     return `${baseUrl}/${path}/${id}`;
   };
 
@@ -145,7 +149,7 @@ export default function StatusIntelligentDashboard({ user }: { user: any }) {
       });
       setSuccessData({ id: docRef.id, status: "pre-transport" });
       setOpenModal(false);
-      setFormData({ calfAge: '', colostrumStatus: 'Adequate', lastFeeding: '', plannedDuration: '', ambientTemp: 'Mild' });
+      setFormData({ calfAge: '', location: '', colostrumStatus: 'Adequate', lastFeeding: '', plannedDuration: '', ambientTemp: 'Mild' });
     } catch (error) {
       console.error("Submit error:", error);
     }
@@ -173,7 +177,6 @@ export default function StatusIntelligentDashboard({ user }: { user: any }) {
     }
   };
 
-  // Guard for server-side rendering
   if (!hasMounted) return null;
 
   if (successData) {
@@ -196,13 +199,13 @@ export default function StatusIntelligentDashboard({ user }: { user: any }) {
 
   return (
     <Box sx={{ 
-    minHeight: '100vh', 
-    pb: 12, 
-    backgroundImage: `linear-gradient(to bottom, rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.8)), url('/bg-image.avif')`,
-    backgroundSize: 'cover',
-    backgroundPosition: 'center',
-    backgroundAttachment: 'fixed' 
-  }}>
+      minHeight: '100vh', 
+      pb: 12, 
+      backgroundImage: `linear-gradient(to bottom, rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.8)), url('/bg-image.avif')`,
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      backgroundAttachment: 'fixed' 
+    }}>
       
       {/* HEADER */}
       <Box sx={{ p: 3, pt: 6 }}>
@@ -228,7 +231,7 @@ export default function StatusIntelligentDashboard({ user }: { user: any }) {
 
         <Stack direction="row" spacing={1.5} justifyContent="center" alignItems="center" sx={{ mb: 4 }}>
           <Avatar sx={{ bgcolor: '#10b981', width: 32, height: 32 }}><ShieldIcon sx={{ fontSize: 18 }} /></Avatar>
-          <Typography variant="h5" fontWeight="900" color="#fff" sx={{ letterSpacing: '-1.5px' }}>FARMER'S <span style={{ color: '#10b981' }}>FRIEND</span></Typography>
+          <Typography variant="h5" fontWeight="900" color="#fff" sx={{ letterSpacing: '-1.5px' }}>TRANSIT <span style={{ color: '#10b981' }}>CALF</span></Typography>
         </Stack>
 
         <TextField 
@@ -286,6 +289,15 @@ export default function StatusIntelligentDashboard({ user }: { user: any }) {
                               <Link href={getNextStepUrl(calf.id, calf.status)}>
                                 <IconButton sx={{ bgcolor: '#0f172a', color: '#fff' }}>{getStatusIcon(calf.status)}</IconButton>
                               </Link>
+
+                              {calf.status === 'pre-transport' && (
+                                <Link href={getNextStepUrl(calf.id, calf.status, 'arrival')}>
+                                  <IconButton title="Skip to Arrival" sx={{ bgcolor: '#10b981', color: '#fff' }}>
+                                    <LocationOnIcon fontSize="small" />
+                                  </IconButton>
+                                </Link>
+                              )}
+
                               <IconButton onClick={() => setArchiveConfirm({ open: true, id: calf.id })} sx={{ color: '#ef4444', bgcolor: alpha('#ef4444', 0.1) }}>
                                 <DeleteSweepIcon fontSize="small" />
                               </IconButton>
@@ -331,6 +343,10 @@ export default function StatusIntelligentDashboard({ user }: { user: any }) {
             <form onSubmit={handleSubmit}>
               <Stack spacing={2.5}>
                 <TextField label="Calf age (days)" variant="filled" type="number" fullWidth required value={formData.calfAge} onChange={(e) => setFormData({...formData, calfAge: e.target.value})} />
+                
+                {/* Location moved below Calf Age */}
+                <TextField label="Pickup Location" variant="filled" fullWidth required value={formData.location} onChange={(e) => setFormData({...formData, location: e.target.value})} />
+                
                 <TextField select label="Colostrum status" variant="filled" fullWidth value={formData.colostrumStatus} onChange={(e) => setFormData({...formData, colostrumStatus: e.target.value})}>
                   <MenuItem value="Adequate">Adequate</MenuItem>
                   <MenuItem value="Unknown">Unknown</MenuItem>

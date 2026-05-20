@@ -19,6 +19,7 @@ import StatusIntelligentDashboard from './dashboard';
 export default function SaaSGateway() {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [mounted, setMounted] = useState(false); // New state to handle hydration
   const [tab, setTab] = useState(0); 
   const [showPassword, setShowPassword] = useState(false);
   
@@ -28,7 +29,13 @@ export default function SaaSGateway() {
   const [message, setMessage] = useState('');
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (u) => { setUser(u); setLoading(false); });
+    // Set mounted to true once we hit the client
+    setMounted(true);
+    
+    const unsubscribe = onAuthStateChanged(auth, (u) => { 
+      setUser(u); 
+      setLoading(false); 
+    });
     return () => unsubscribe();
   }, []);
 
@@ -55,7 +62,8 @@ export default function SaaSGateway() {
     } catch (err: any) { setError("Failed to send reset email."); }
   };
 
-  if (loading) return (
+  // Prevent hydration mismatch by returning a consistent shell until mounted
+  if (!mounted || loading) return (
     <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: '#0f172a' }}>
       <CircularProgress sx={{ color: '#10b981' }} />
     </Box>
@@ -74,11 +82,14 @@ export default function SaaSGateway() {
         <Paper sx={{ p: 4, borderRadius: 8, backdropFilter: 'blur(16px)', bgcolor: 'rgba(255,255,255,0.95)', textAlign: 'center' }}>
           <Stack spacing={1} alignItems="center" sx={{ mb: 3 }}>
             <Avatar sx={{ bgcolor: '#10b981', width: 56, height: 56, mb: 1 }}><ShieldIcon sx={{ fontSize: 32 }} /></Avatar>
-            <Typography variant="h4" fontWeight="900" sx={{ letterSpacing: '-2px' }}>FARMER'S <span style={{ color: '#10b981' }}>FRIEND</span></Typography>
+            <Typography variant="h4" fontWeight="900" sx={{ letterSpacing: '-2px' }}>
+              TRANSIT <span style={{ color: '#10b981' }}>CALF</span>
+            </Typography>
           </Stack>
 
           <Tabs value={tab} onChange={(e, v) => setTab(v)} variant="fullWidth" sx={{ mb: 3, '& .MuiTabs-indicator': { bgcolor: '#10b981' } }}>
-            <Tab label="Login" sx={{ fontWeight: 800 }} /><Tab label="Join" sx={{ fontWeight: 800 }} />
+            <Tab label="Login" sx={{ fontWeight: 800 }} />
+            <Tab label="Join" sx={{ fontWeight: 800 }} />
           </Tabs>
 
           <form onSubmit={handleAuth}>
@@ -88,7 +99,9 @@ export default function SaaSGateway() {
                 value={password} onChange={(e) => setPassword(e.target.value)}
                 InputProps={{ endAdornment: (
                   <InputAdornment position="end">
-                    <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">{showPassword ? <VisibilityOff /> : <Visibility />}</IconButton>
+                    <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
                   </InputAdornment>
                 )}}
               />

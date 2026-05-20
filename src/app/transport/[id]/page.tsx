@@ -5,11 +5,12 @@ import { useParams, useRouter } from 'next/navigation';
 import { db, auth, doc, updateDoc, getDoc, onAuthStateChanged } from '@/lib/firebase';
 import { 
   Container, Typography, Box, Button, Paper, Stack, 
-  CircularProgress, MenuItem, TextField, Avatar, Fade, alpha, IconButton, Zoom
+  CircularProgress, MenuItem, TextField, Avatar, Fade, alpha, IconButton, Zoom, Divider
 } from '@mui/material';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import ForwardIcon from '@mui/icons-material/Forward';
 import { QRCodeCanvas } from 'qrcode.react';
 
 export default function TransportPage() {
@@ -62,15 +63,15 @@ export default function TransportPage() {
     return () => unsubscribe();
   }, [hasMounted, id, router]);
 
-  const handleUpdateTransport = async (e: React.FormEvent) => {
-    e.preventDefault(); 
+  const handleUpdateTransport = async (e?: React.FormEvent, isSkipping = false) => {
+    if (e) e.preventDefault(); 
     if (!id) return;
     setIsUpdating(true);
     try {
       await updateDoc(doc(db, "calves", id as string), {
         status: 'in-transport',
         inTransportUpdates: {
-          ...transportUpdates,
+          ...(isSkipping ? { skipped: true } : transportUpdates),
           updatedAt: new Date()
         }
       });
@@ -176,7 +177,6 @@ export default function TransportPage() {
                 variant="filled" 
                 type="number" 
                 fullWidth 
-                required 
                 value={transportUpdates.actualDurationSoFar} 
                 onChange={(e) => setTransportUpdates({...transportUpdates, actualDurationSoFar: e.target.value})} 
               />
@@ -186,7 +186,6 @@ export default function TransportPage() {
                 label="Heat or cold stress exposure" 
                 variant="filled" 
                 fullWidth 
-                required
                 value={transportUpdates.stressExposure} 
                 onChange={(e) => setTransportUpdates({...transportUpdates, stressExposure: e.target.value})}
               >
@@ -200,7 +199,6 @@ export default function TransportPage() {
                 label="Delays or extended stops" 
                 variant="filled" 
                 fullWidth 
-                required
                 value={transportUpdates.delays} 
                 onChange={(e) => setTransportUpdates({...transportUpdates, delays: e.target.value})}
               >
@@ -208,16 +206,32 @@ export default function TransportPage() {
                 <MenuItem value="Yes">Yes</MenuItem>
               </TextField>
 
-              <Button 
-                type="submit"
-                variant="contained" 
-                fullWidth 
-                size="large" 
-                disabled={isUpdating} 
-                sx={{ py: 2, borderRadius: 4, bgcolor: '#0f172a', fontWeight: 900, textTransform: 'none' }}
-              >
-                {isUpdating ? <CircularProgress size={24} sx={{ color: 'white' }} /> : "Generate Arrival Code"}
-              </Button>
+              <Stack spacing={2}>
+                <Button 
+                  type="submit"
+                  variant="contained" 
+                  fullWidth 
+                  size="large" 
+                  disabled={isUpdating} 
+                  sx={{ py: 2, borderRadius: 4, bgcolor: '#0f172a', fontWeight: 900, textTransform: 'none' }}
+                >
+                  {isUpdating ? <CircularProgress size={24} sx={{ color: 'white' }} /> : "Generate Arrival Code"}
+                </Button>
+
+                <Divider sx={{ fontWeight: 600, color: '#64748b', fontSize: '0.75rem' }}>OR</Divider>
+
+                <Button 
+                  onClick={() => handleUpdateTransport(undefined, true)}
+                  variant="outlined" 
+                  fullWidth 
+                  size="large" 
+                  startIcon={<ForwardIcon />}
+                  disabled={isUpdating} 
+                  sx={{ py: 1.5, borderRadius: 4, color: '#10b981', borderColor: '#10b981', fontWeight: 700, textTransform: 'none' }}
+                >
+                  Skip & Move to Arrival
+                </Button>
+              </Stack>
             </Stack>
           </form>
         </Paper>

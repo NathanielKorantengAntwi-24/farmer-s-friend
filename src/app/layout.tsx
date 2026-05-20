@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
 
 // 1. Identity & SEO Metadata
 export const metadata: Metadata = {
-  title: "Farmer's Friend",
+  title: "Transit Calf",
   description: "Precision Calf Dehydration Management",
   manifest: "/manifest.json", 
   // Added icons for browser tab visibility
